@@ -1,19 +1,19 @@
 #include <ESP8266WiFi.h>
 #include <MicroGear.h>
 #define APPID   "NETPIE2VALVE"
-#define KEY     "WcTxK4EMocRJCcF"
-#define SECRET  "H0AHhsFat0L0AIBmdmR3IhN6J"
+#define KEY     "<KEY>"
+#define SECRET  "<SECRET>"
 #define ALIAS   "Relay_valve" 
 
 WiFiClient client;
 MicroGear microgear(client);
-const char* ssid = "Wanna_2.4G_plus"; //3bb-Aekkaphob_plus
-const char* password = "0632017824"; //0927569471
+const char* ssid = "XXXXX"; 
+const char* password = "XXXXX";
 const char* wifi_Check_status = "";
 long timer = 0;
 bool reconnect = false;
 
-/* If a new message arrives, do this */
+/* ฟังก์ชันสำหรับอ่านค่า json จาก api (เรียกใช้ใน infinity loop) */
 void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) {
     String iMsg = "";
       for (int i = 0; i < msglen; i++) {
@@ -22,16 +22,16 @@ void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) {
   if(iMsg == "ON1" || iMsg == "ON2" || iMsg == "ONALL" || iMsg == "OFFALL"){
     if (iMsg == "ON1") 
     {
-        Serial.println("ON1.");
+        Serial.println("ON1."); // ส่งข้อความไปยังบอร์ดอาร์ดูโน่แบบ serial communication ผ่านserial portสาย tx/rx 
     } 
       if (iMsg == "ON2") {
-        Serial.println("ON2.");
+        Serial.println("ON2."); // ส่งข้อความไปยังบอร์ดอาร์ดูโน่แบบ serial communication ผ่านserial portสาย tx/rx 
       }
       if (iMsg == "ONALL") {
-        Serial.println("ONALL.");
+        Serial.println("ONALL."); // ส่งข้อความไปยังบอร์ดอาร์ดูโน่แบบ serial communication ผ่านserial portสาย tx/rx 
       }
       if (iMsg == "OFFALL") {
-        Serial.println("OFFALL.");
+        Serial.println("OFFALL."); // ส่งข้อความไปยังบอร์ดอาร์ดูโน่แบบ serial communication ผ่านserial portสาย tx/rx 
       }
   }
 }
@@ -42,12 +42,12 @@ void onConnected(char *attribute, uint8_t* msg, unsigned int msglen) {
 }
 
 void setup() {
-      Serial.begin(115200);
+      Serial.begin(115200); // เลือกค่า Buad Rate สำหรับการสื่อสารแบบ Serial Communication ผ่านserial portสาย tx/rx 
       WiFi.disconnect(); // Disconnect AP
       WiFi.mode(WIFI_STA);
       WiFi.begin(ssid, password);   //Connect WIFI
 
-      while (WiFi.status() != WL_CONNECTED) 
+      while (WiFi.status() != WL_CONNECTED) // ดีเลย์ 500 วินาที เพื่อรอการเชื่อมต่อ WiFi
       {
         delay(500);
       }
@@ -56,10 +56,10 @@ void setup() {
       microgear.init(KEY,SECRET,ALIAS);
       microgear.connect(APPID);
       wifi_Check_status = "connect";
-      Serial.println("connect.");
+      Serial.println("connect."); // ส่งข้อความไปยังบอร์ดอาร์ดูโน่แบบ serial communication ผ่านserial portสาย tx/rx 
 }
 
-void loop() {
+void loop() {  // Infinity loop ที่จะทำงานตลอดเวลาที่ตัวบอร์ดเปิดอยู่
       if(WiFi.status() != WL_CONNECTED)
       {
         if(!wifi_Check_status || wifi_Check_status == "connect")
@@ -106,23 +106,23 @@ void loop() {
           String msg = Serial.readStringUntil('.');  //read serial messege character until '.'(dot)
             if(msg == "OP1")  //valve1 = ON - Valve2 = OFF
             {   
-              microgear.subscribe("/relaystat");
-              microgear.publish("/relaystat","1",true);
+              microgear.subscribe("/relaystat");    // เลือกแชแนลที่จะส่งข้อความชื่อ relaystat
+              microgear.publish("/relaystat","1",true); //postค่าสถานะของรีเลย์ไปที่ api 
             }
             if(msg == "OP2")  //valve1 = OFF - Valve2 = ON
             {   
-              microgear.subscribe("/relaystat");
-              microgear.publish("/relaystat","2",true);
+              microgear.subscribe("/relaystat"); // เลือกแชแนลที่จะส่งข้อความชื่อ relaystat
+              microgear.publish("/relaystat","2",true); //postค่าสถานะของรีเลย์ไปที่ api 
             }
             if(msg == "ED3")  //valve1 = ON - Valve2 = ON
             {   
-              microgear.subscribe("/relaystat");
-              microgear.publish("/relaystat","3",true);
+              microgear.subscribe("/relaystat"); // เลือกแชแนลที่จะส่งข้อความชื่อ relaystat
+              microgear.publish("/relaystat","3",true); //postค่าสถานะของรีเลย์ไปที่ api 
             }
             if(msg == "ED4")  //valve1 = OFF - Valve2 = OFF
             {   
-              microgear.subscribe("/relaystat");
-              microgear.publish("/relaystat","4",true);
+              microgear.subscribe("/relaystat"); // เลือกแชแนลที่จะส่งข้อความชื่อ relaystat
+              microgear.publish("/relaystat","4",true); //postค่าสถานะของรีเลย์ไปที่ api 
             }
     }
 }
